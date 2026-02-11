@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BioGenAI: Homeostasis (Mobile)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f7ae0">
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#eef2f7}
+header{background:#1f7ae0;color:#fff;padding:16px;text-align:center;font-size:1.2em;font-weight:bold}
+nav{display:flex;justify-content:space-around;position:fixed;bottom:0;width:100%;background:#fff;border-top:1px solid #ccc}
+nav button{flex:1;padding:14px;border:none;background:none;font-size:.85em}
+.section{display:none;padding:16px;padding-bottom:80px}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+button.primary{width:100%;padding:14px;border:none;border-radius:10px;background:#1f7ae0;color:#fff;font-size:1em}
+.correct{color:#2e7d32;font-weight:bold}
+.incorrect{color:#c62828;font-weight:bold}
+.step{background:#e3f2fd;padding:10px;margin:6px 0;border-radius:8px;font-weight:bold}
+.slot{border:2px dashed #999;border-radius:8px;padding:10px;margin:6px 0;text-align:center;font-weight:bold;color:#777}
+</style>
+</head>
+<body>
+
+<header>BioGenAI: Homeostasis</header>
+
+<div id="learn" class="section">
+<div class="card">
+<h3>Homeostasis</h3>
+<p>Homeostasis is the ability of organisms to maintain a stable internal environment.</p>
+</div>
+</div>
+
+<div id="game" class="section">
+<div class="card">
+<h3>Game: Negative Feedback Loop</h3>
+<p>Tap the steps in correct order.</p>
+<div id="choices"></div>
+<div id="answer"></div>
+<button class="primary" onclick="check()">Check Answer</button>
+<p id="result"></p>
+</div>
+</div>
+
+<div id="check" class="section">
+<div class="card">
+<h3>Quick Check</h3>
+<p>Negative feedback restores balance.</p>
+<button onclick="grade(1)">True</button>
+<button onclick="grade(0)">False</button>
+<p id="score"></p>
+</div>
+</div>
+
+<nav>
+<button onclick="show('learn')">Learn</button>
+<button onclick="show('game')">Game</button>
+<button onclick="show('check')">Check</button>
+</nav>
+
+<script>
+const correct=["Stimulus","Receptor","Control Center","Effector","Balance Restored"];
+let picked=[];
+
+function show(id){
+ document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+ document.getElementById(id).style.display='block';
+ if(id==="game") loadGame();
+}
+
+function loadGame(){
+ picked=[];
+ result.innerHTML="";
+ choices.innerHTML="";
+ answer.innerHTML="";
+ [...correct].sort(()=>Math.random()-0.5).forEach(s=>{
+  let d=document.createElement("div");
+  d.className="step"; d.innerText=s;
+  d.onclick=()=>{
+    if(!picked.includes(s)){
+      picked.push(s);
+      let a=document.createElement("div");
+      a.className="slot"; a.innerText=s;
+      answer.appendChild(a);
+    }
+  };
+  choices.appendChild(d);
+ });
+}
+
+function check(){
+ if(picked.length!==correct.length){result.innerHTML="<span class='incorrect'>Complete all steps.</span>";return;}
+ for(let i=0;i<correct.length;i++){
+  if(picked[i]!==correct[i]){result.innerHTML="<span class='incorrect'>Incorrect order.</span>";return;}
+ }
+ result.innerHTML="<span class='correct'>Correct!</span>";
+}
+
+function grade(v){
+ score.innerHTML=v===1?"<span class='correct'>Correct</span>":"<span class='incorrect'>Incorrect</span>";
+}
+
+show('learn');
+
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
